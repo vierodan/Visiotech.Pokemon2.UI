@@ -7,10 +7,13 @@ Demo UI en React + Vite + TypeScript para consumir la API documentada en `backen
 La app usa `VITE_API_BASE_URL` desde `.env.local`.
 
 ```bash
-VITE_API_BASE_URL=http://localhost:5090
+VITE_API_BASE_URL=/api
+VITE_API_PROXY_TARGET=http://localhost:5090
 ```
 
-El contrato OpenAPI incluido en el workspace publica `http://localhost:5090/` como servidor de referencia, por eso ese valor se deja por defecto en la demo.
+En desarrollo local la recomendación es usar `/api` como base URL y dejar que Vite haga proxy hacia el backend real. Así evitamos problemas de CORS en navegador aunque Postman funcione correctamente.
+
+Si en otro entorno no necesitas proxy, `VITE_API_BASE_URL` también puede apuntar a una URL absoluta.
 
 ## Ejecución
 

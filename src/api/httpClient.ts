@@ -37,7 +37,10 @@ const buildUrl = (path: string, query?: QueryParams): string => {
   }
 
   const normalizedPath = path.replace(/^\//, '');
-  const url = new URL(normalizedPath, `${apiConfig.baseUrl}/`);
+  const baseUrl = /^https?:\/\//i.test(apiConfig.baseUrl)
+    ? `${apiConfig.baseUrl}/`
+    : new URL(apiConfig.baseUrl.replace(/^\//, ''), window.location.origin + '/').toString();
+  const url = new URL(normalizedPath, baseUrl);
 
   if (!query) {
     return url.toString();
@@ -138,4 +141,3 @@ export const httpClient = {
   delete: <T>(path: string, options?: Omit<HttpRequestOptions, 'body'>): Promise<T> =>
     request<T>('DELETE', path, options),
 };
-
