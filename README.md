@@ -1,79 +1,89 @@
 # Visiotech Frontend Demo
 
-Demo UI en React + Vite + TypeScript para consumir la API documentada en `backend/visiotech-pokemon-api-v1.json`.
+Demo UI en React + Vite + TypeScript para consumir la API de Visiotech Pokémon.
 
-## Configuración
+## Requisitos previos para la ejecución de la UI
 
-La app usa `VITE_API_BASE_URL` desde `.env.local`.
+Antes de arrancar la interfaz, conviene dejar preparado el backend y cargar datos de prueba para que la UI pueda consultar catálogos, listar `my-pokemons` y ejecutar simulaciones reales.
+
+### 1. Arrancar previamente la API
+
+La UI necesita que la API esté disponible por HTTP. El backend documenta ambos modos en `../backend/README.md`.
+
+#### Opción A. API con Postgres
+
+Modo recomendado cuando se quiere trabajar con persistencia real.
+
+Desde la carpeta `backend/`:
+
+```bash
+cp .env.example .env
+docker compose up -d
+dotnet run --project src/Host/Visiotech.Pokemon.Host
+```
+
+Por defecto, la API queda accesible en:
+
+```txt
+http://localhost:5090
+```
+
+#### Opción B. API en modo InMemory
+
+Modo útil para desarrollo rápido local sin levantar PostgreSQL.
+
+La API debe arrancarse en `Development` con el proveedor `InMemory`:
+
+```bash
+ASPNETCORE_ENVIRONMENT=Development Persistence__Provider=InMemory dotnet run --project src/Host/Visiotech.Pokemon.Host
+```
+
+Este modo solo está permitido en `Development`.
+
+### 2. Ejecutar el script siguiendo las instrucciones de `docs/seed.md`
+
+Una vez que la API esté levantada, ejecuta el seed del frontend para poblar el backend usando la propia API HTTP.
+
+Instala dependencias si todavía no lo has hecho:
+
+```bash
+npm install
+```
+
+Ejecuta el seed:
+
+```bash
+npm run seed
+```
+
+Si la API no está en el puerto por defecto, indica la URL base explícitamente:
+
+```bash
+API_BASE_URL=http://localhost:5091 npm run seed
+```
+
+La guía completa del seed, incluyendo variables soportadas y ejemplos adicionales, está en [docs/seed.md](docs/seed.md).
+
+## Instrucciones para arrancar la UI
+
+Configura la URL base de la API en `.env.local`:
 
 ```bash
 VITE_API_BASE_URL=/api
 VITE_API_PROXY_TARGET=http://localhost:5090
 ```
 
-En desarrollo local la recomendación es usar `/api` como base URL y dejar que Vite haga proxy hacia el backend real. Así evitamos problemas de CORS en navegador aunque Postman funcione correctamente.
+En desarrollo local, se recomienda usar `VITE_API_BASE_URL=/api` y dejar que Vite haga proxy hacia la API real para evitar problemas de CORS.
 
-Si en otro entorno no necesitas proxy, `VITE_API_BASE_URL` también puede apuntar a una URL absoluta.
-
-## Ejecución
+Después, arranca la aplicación:
 
 ```bash
-npm install
 npm run dev
 ```
 
-Para validar compilación y lint:
+Comandos útiles de validación:
 
 ```bash
 npm run lint
 npm run build
 ```
-
-## Seed de datos por API
-
-El proyecto incluye un seed en `Node.js + TypeScript` que puebla el backend usando exclusivamente la API documentada en `backend/visiotech-pokemon-api-v1.json`.
-
-Comando:
-
-```bash
-npm run seed
-```
-
-Variables soportadas:
-
-```bash
-API_BASE_URL=http://localhost:5090
-API_BEARER_TOKEN=
-SEED_TAG=seed
-SEED_MOVES=20
-SEED_SPECIES=12
-SEED_MY_POKEMONS=40
-SEED_BATTLES=10
-SEED_PHASES_MIN=3
-SEED_PHASES_MAX=5
-SEED_PAGE_SIZE=100
-SEED_REQUEST_PAUSE_MS=0
-```
-
-Notas de comportamiento:
-
-- `moves` y `pokemons` se reutilizan por nombre y se actualizan solo si difieren del plan esperado.
-- `pokemons/{id}/learnable-moves` se sincroniza sobre los moves seed, sin borrar relaciones ajenas al seed.
-- `my-pokemons` intenta reutilizar firmas exactas y, si una batalla alteró su estado mutable, los restaura con `PUT`.
-- `battles` y `battles/{id}/phases` son aditivos: el contrato no expone un catálogo global de batallas para reutilizarlas de forma segura entre ejecuciones.
-
-## Qué demuestra la UI
-
-- `GET /api/v1/system` para comprobar conectividad y metadatos del host.
-- `GET /api/v1/moves`, `GET /api/v1/pokemons` y `GET /api/v1/my-pokemons` con los filtros soportados por contrato.
-- `POST /api/v1/damage-calculations` usando IDs reales de `my-pokemons` y `equippedMoves`.
-
-## Estructura relevante
-
-- `src/api/`: configuración, cliente HTTP, parsing de errores y servicios tipados.
-- `src/features/apiDemo/`: componentes de la demo conectada al backend.
-- `src/pages/HomePage.tsx`: composición principal de la experiencia.
-
-## Nota sobre autenticación
-
-El contrato actual no declara `securitySchemes`, pero el cliente HTTP ya permite adjuntar un Bearer token temporal desde la UI por si el backend evoluciona en esa dirección.
