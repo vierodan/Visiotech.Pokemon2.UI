@@ -10,7 +10,7 @@ export default tseslint.config(
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ['**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -24,5 +24,12 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['scripts/**/*.ts', 'vite.config.ts'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.node,
+    },
+  },
 );
-
