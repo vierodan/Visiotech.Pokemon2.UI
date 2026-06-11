@@ -1,0 +1,56 @@
+:root {
+  --color-page: #f5efe6;
+  --color-surface: #fffdf9;
+  --color-primary: #1f4a7a;
+  --color-accent: #f28c52;
+  --color-accent-strong: #b85e2c;
+  --color-ink: #2c3a4a;
+  --color-ink-strong: #132033;
+  --color-ink-soft: #546272;
+  --color-success: #3d7a5e;
+  --color-danger: #c94841;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+  --font-body: 'Avenir Next', 'Segoe UI', 'Helvetica Neue', sans-serif;
+  --font-mono: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: var(--font-body);
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  appearance: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+#root {
+  min-height: 100vh;
+}

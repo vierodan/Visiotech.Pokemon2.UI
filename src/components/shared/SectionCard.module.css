@@ -1,0 +1,35 @@
+.card {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(14, 27, 43, 0.08);
+  border-radius: 1.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 28px 80px rgba(14, 27, 43, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.eyebrow {
+  margin: 0 0 0.6rem;
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.header {
+  margin-bottom: 1.15rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-family: var(--font-display);
+  color: var(--color-ink-strong);
+}
+
+.description {
+  margin: 0.55rem 0 0;
+  color: var(--color-ink-soft);
+  line-height: 1.6;
+}
+

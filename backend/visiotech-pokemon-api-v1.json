@@ -1,0 +1,2529 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Visiotech.Pokemon.Host | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5090/"
+    }
+  ],
+  "paths": {
+    "/api/v1/battles": {
+      "post": {
+        "tags": [
+          "BattleEndpoints"
+        ],
+        "summary": "Creates a battle between exactly two playable pokemon instances.",
+        "operationId": "CreateBattle",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBattleRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BattleContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/battles/{id}": {
+      "get": {
+        "tags": [
+          "BattleEndpoints"
+        ],
+        "summary": "Returns the current state and recorded history of a battle.",
+        "operationId": "GetBattleState",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BattleContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/battles/{id}/phases": {
+      "post": {
+        "tags": [
+          "BattleEndpoints"
+        ],
+        "summary": "Executes the next battle phase for a battle using an equipped move.",
+        "operationId": "ExecuteBattlePhase",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteBattlePhaseRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BattlePhaseExecutionContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "BattleEndpoints"
+        ],
+        "summary": "Returns the ordered history of recorded battle phases.",
+        "operationId": "GetBattleHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BattleHistoryContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/damage-calculations": {
+      "post": {
+        "tags": [
+          "DamageCalculationEndpoints"
+        ],
+        "summary": "Calculates the damage a move would deal from one playable pokemon instance to another.",
+        "operationId": "CalculateMoveDamage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalculateMoveDamageRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MoveDamageCalculationContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/system": {
+      "get": {
+        "tags": [
+          "SystemEndpoints"
+        ],
+        "summary": "Returns technical metadata about the API host.",
+        "operationId": "GetSystemInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemInfoContract"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/moves": {
+      "post": {
+        "tags": [
+          "MoveEndpoints"
+        ],
+        "summary": "Creates a move in the catalog.",
+        "operationId": "CreatePokemonMove",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePokemonMoveRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonMoveContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "MoveEndpoints"
+        ],
+        "summary": "Returns the move catalog exposed by the API.",
+        "operationId": "GetPokemonMovesCatalog",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonMoveCatalogContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/moves/{id}": {
+      "put": {
+        "tags": [
+          "MoveEndpoints"
+        ],
+        "summary": "Updates a move in the catalog.",
+        "operationId": "UpdatePokemonMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePokemonMoveRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonMoveContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "MoveEndpoints"
+        ],
+        "summary": "Deletes a move from the catalog when it has no active dependencies.",
+        "operationId": "DeletePokemonMove",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "MoveEndpoints"
+        ],
+        "summary": "Returns the detail of a move.",
+        "operationId": "GetPokemonMoveDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonMoveContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/moves/{id}/pokemon-species": {
+      "get": {
+        "tags": [
+          "MoveEndpoints"
+        ],
+        "summary": "Returns the base pokemon species that can learn a given move.",
+        "operationId": "GetPokemonMoveSharedSpecies",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonMoveSharedSpeciesContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pokemons": {
+      "post": {
+        "tags": [
+          "PokemonEndpoints"
+        ],
+        "summary": "Creates a base pokemon species in the catalog.",
+        "operationId": "CreatePokemonSpecies",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePokemonSpeciesRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonSpeciesContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "PokemonEndpoints"
+        ],
+        "summary": "Returns the base pokemon species catalog exposed by the API.",
+        "operationId": "GetPokemonsCatalog",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonSpeciesCatalogContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pokemons/{id}": {
+      "put": {
+        "tags": [
+          "PokemonEndpoints"
+        ],
+        "summary": "Updates a base pokemon species in the catalog.",
+        "operationId": "UpdatePokemonSpecies",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePokemonSpeciesRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonSpeciesContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "PokemonEndpoints"
+        ],
+        "summary": "Deletes a base pokemon species from the catalog when it has no active dependencies.",
+        "operationId": "DeletePokemonSpecies",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "PokemonEndpoints"
+        ],
+        "summary": "Returns the detail of a base pokemon species.",
+        "operationId": "GetPokemonSpeciesDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonSpeciesContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/pokemons/{id}/learnable-moves": {
+      "put": {
+        "tags": [
+          "PokemonEndpoints"
+        ],
+        "summary": "Associates or removes learnable moves for a base pokemon species.",
+        "operationId": "UpdatePokemonSpeciesLearnableMoves",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePokemonLearnableMovesRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonLearnableMovesContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "PokemonEndpoints"
+        ],
+        "summary": "Returns the learnable move catalog for a base pokemon species.",
+        "operationId": "GetPokemonSpeciesLearnableMoves",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PokemonLearnableMovesContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/my-pokemons": {
+      "post": {
+        "tags": [
+          "MyPokemonEndpoints"
+        ],
+        "summary": "Creates a playable pokemon instance based on a base species.",
+        "operationId": "CreateMyPokemon",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMyPokemonRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPokemonContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "MyPokemonEndpoints"
+        ],
+        "summary": "Returns the playable pokemon instances registered in the API.",
+        "operationId": "GetMyPokemonsCatalog",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPokemonCatalogContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/my-pokemons/{id}": {
+      "put": {
+        "tags": [
+          "MyPokemonEndpoints"
+        ],
+        "summary": "Updates the mutable state of a playable pokemon instance.",
+        "operationId": "UpdateMyPokemon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMyPokemonRequestContract"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPokemonContract"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "MyPokemonEndpoints"
+        ],
+        "summary": "Deletes a playable pokemon instance when it is not used by active dependencies.",
+        "operationId": "DeleteMyPokemon",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "MyPokemonEndpoints"
+        ],
+        "summary": "Returns the detail of a playable pokemon instance.",
+        "operationId": "GetMyPokemonDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPokemonContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/my-pokemons/{id}/equipped-moves": {
+      "get": {
+        "tags": [
+          "MyPokemonEndpoints"
+        ],
+        "summary": "Returns the moves currently equipped by a playable pokemon instance.",
+        "operationId": "GetMyPokemonEquippedMoves",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyPokemonEquippedMovesContract"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BattleCombatantContract": {
+        "required": [
+          "slotNumber",
+          "myPokemonId",
+          "currentHealthPoints",
+          "totalHealthPoints"
+        ],
+        "type": "object",
+        "properties": {
+          "slotNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "myPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "currentHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "BattleContract": {
+        "required": [
+          "id",
+          "status",
+          "currentTurnNumber",
+          "nextAttackerMyPokemonId",
+          "winnerMyPokemonId",
+          "loserMyPokemonId",
+          "combatants",
+          "history"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "currentTurnNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "nextAttackerMyPokemonId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "winnerMyPokemonId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "loserMyPokemonId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "combatants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BattleCombatantContract"
+            }
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BattlePhaseContract"
+            }
+          }
+        }
+      },
+      "BattleHistoryContract": {
+        "required": [
+          "battleId",
+          "phases"
+        ],
+        "type": "object",
+        "properties": {
+          "battleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "phases": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BattlePhaseContract"
+            }
+          }
+        }
+      },
+      "BattlePhaseContract": {
+        "required": [
+          "sequenceNumber",
+          "attackerMyPokemonId",
+          "defenderMyPokemonId",
+          "moveId",
+          "moveName",
+          "randomFactor",
+          "effectivenessBreakdown",
+          "totalEffectiveness",
+          "damage",
+          "attackerRemainingHealthPoints",
+          "defenderRemainingHealthPoints"
+        ],
+        "type": "object",
+        "properties": {
+          "sequenceNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "attackerMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "defenderMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moveId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moveName": {
+            "type": "string"
+          },
+          "randomFactor": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "effectivenessBreakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BattlePhaseEffectivenessContract"
+            }
+          },
+          "totalEffectiveness": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "damage": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "attackerRemainingHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "defenderRemainingHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "BattlePhaseEffectivenessContract": {
+        "required": [
+          "defenderType",
+          "multiplier"
+        ],
+        "type": "object",
+        "properties": {
+          "defenderType": {
+            "type": "string"
+          },
+          "multiplier": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "BattlePhaseExecutionContract": {
+        "required": [
+          "battle",
+          "damageCalculation"
+        ],
+        "type": "object",
+        "properties": {
+          "battle": {
+            "$ref": "#/components/schemas/BattleContract"
+          },
+          "damageCalculation": {
+            "$ref": "#/components/schemas/MoveDamageCalculationContract"
+          }
+        }
+      },
+      "CalculateMoveDamageRequestContract": {
+        "required": [
+          "attackerMyPokemonId",
+          "defenderMyPokemonId",
+          "moveId"
+        ],
+        "type": "object",
+        "properties": {
+          "attackerMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "defenderMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moveId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateBattleRequestContract": {
+        "required": [
+          "firstMyPokemonId",
+          "secondMyPokemonId"
+        ],
+        "type": "object",
+        "properties": {
+          "firstMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "secondMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateMyPokemonRequestContract": {
+        "required": [
+          "pokemonSpeciesId",
+          "level",
+          "currentHealthPoints",
+          "totalHealthPoints",
+          "equippedMoveIds"
+        ],
+        "type": "object",
+        "properties": {
+          "pokemonSpeciesId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "currentHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "equippedMoveIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "CreatePokemonMoveRequestContract": {
+        "required": [
+          "name",
+          "type",
+          "category",
+          "power"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "power": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "CreatePokemonSpeciesRequestContract": {
+        "required": [
+          "name",
+          "types",
+          "baseStats"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "types": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "baseStats": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PokemonBaseStatsContract"
+              }
+            ]
+          }
+        }
+      },
+      "ExecuteBattlePhaseRequestContract": {
+        "required": [
+          "attackerMyPokemonId",
+          "moveId"
+        ],
+        "type": "object",
+        "properties": {
+          "attackerMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moveId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "MoveDamageCalculationContract": {
+        "required": [
+          "attackerMyPokemonId",
+          "defenderMyPokemonId",
+          "moveId",
+          "moveName",
+          "moveType",
+          "moveCategory",
+          "attackerLevel",
+          "movePower",
+          "offensiveStat",
+          "offensiveStatValue",
+          "defensiveStat",
+          "defensiveStatValue",
+          "defenderCurrentHealthPoints",
+          "randomFactor",
+          "baseDamage",
+          "effectivenessBreakdown",
+          "totalEffectiveness",
+          "rawDamage",
+          "damage",
+          "defenderRemainingHealthPoints"
+        ],
+        "type": "object",
+        "properties": {
+          "attackerMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "defenderMyPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moveId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moveName": {
+            "type": "string"
+          },
+          "moveType": {
+            "type": "string"
+          },
+          "moveCategory": {
+            "type": "string"
+          },
+          "attackerLevel": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "movePower": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "offensiveStat": {
+            "type": "string"
+          },
+          "offensiveStatValue": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "defensiveStat": {
+            "type": "string"
+          },
+          "defensiveStatValue": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "defenderCurrentHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "randomFactor": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "baseDamage": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "effectivenessBreakdown": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MoveDamageCalculationEffectivenessContract"
+            }
+          },
+          "totalEffectiveness": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "rawDamage": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "damage": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "defenderRemainingHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "MoveDamageCalculationEffectivenessContract": {
+        "required": [
+          "defenderType",
+          "multiplier"
+        ],
+        "type": "object",
+        "properties": {
+          "defenderType": {
+            "type": "string"
+          },
+          "multiplier": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "MyPokemonCatalogContract": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyPokemonContract"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "MyPokemonContract": {
+        "required": [
+          "id",
+          "species",
+          "level",
+          "currentHealthPoints",
+          "totalHealthPoints",
+          "equippedMoves"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "species": {
+            "$ref": "#/components/schemas/PokemonSpeciesContract"
+          },
+          "level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "currentHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "equippedMoves": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PokemonMoveContract"
+            }
+          }
+        }
+      },
+      "MyPokemonEquippedMovesContract": {
+        "required": [
+          "myPokemonId",
+          "moves"
+        ],
+        "type": "object",
+        "properties": {
+          "myPokemonId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moves": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PokemonMoveContract"
+            }
+          }
+        }
+      },
+      "PokemonBaseStatsContract": {
+        "required": [
+          "health",
+          "attack",
+          "defense",
+          "specialAttack",
+          "specialDefense",
+          "speed"
+        ],
+        "type": "object",
+        "properties": {
+          "health": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "attack": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "defense": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "specialAttack": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "specialDefense": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "speed": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "PokemonLearnableMovesContract": {
+        "required": [
+          "pokemonSpeciesId",
+          "pokemonSpeciesName",
+          "moves"
+        ],
+        "type": "object",
+        "properties": {
+          "pokemonSpeciesId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "pokemonSpeciesName": {
+            "type": "string"
+          },
+          "moves": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PokemonMoveContract"
+            }
+          }
+        }
+      },
+      "PokemonMoveCatalogContract": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PokemonMoveContract"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "PokemonMoveContract": {
+        "required": [
+          "id",
+          "name",
+          "type",
+          "category",
+          "power"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "power": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "PokemonMoveSharedSpeciesContract": {
+        "required": [
+          "pokemonMoveId",
+          "pokemonMoveName",
+          "pokemonSpecies"
+        ],
+        "type": "object",
+        "properties": {
+          "pokemonMoveId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "pokemonMoveName": {
+            "type": "string"
+          },
+          "pokemonSpecies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PokemonSpeciesContract"
+            }
+          }
+        }
+      },
+      "PokemonSpeciesCatalogContract": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PokemonSpeciesContract"
+            }
+          },
+          "page": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pageSize": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalPages": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "PokemonSpeciesContract": {
+        "required": [
+          "id",
+          "name",
+          "types",
+          "baseStats"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "baseStats": {
+            "$ref": "#/components/schemas/PokemonBaseStatsContract"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SystemInfoContract": {
+        "required": [
+          "service",
+          "environment",
+          "version",
+          "generatedAtUtc"
+        ],
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "environment": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "generatedAtUtc": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdateMyPokemonRequestContract": {
+        "required": [
+          "level",
+          "currentHealthPoints",
+          "totalHealthPoints",
+          "equippedMoveIds"
+        ],
+        "type": "object",
+        "properties": {
+          "level": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "currentHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "totalHealthPoints": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "equippedMoveIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "UpdatePokemonLearnableMovesRequestContract": {
+        "required": [
+          "addMoveIds",
+          "removeMoveIds"
+        ],
+        "type": "object",
+        "properties": {
+          "addMoveIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "removeMoveIds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "UpdatePokemonMoveRequestContract": {
+        "required": [
+          "name",
+          "type",
+          "category",
+          "power"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "category": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "power": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "UpdatePokemonSpeciesRequestContract": {
+        "required": [
+          "name",
+          "types",
+          "baseStats"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "types": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "baseStats": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PokemonBaseStatsContract"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "BattleEndpoints"
+    },
+    {
+      "name": "DamageCalculationEndpoints"
+    },
+    {
+      "name": "SystemEndpoints"
+    },
+    {
+      "name": "MoveEndpoints"
+    },
+    {
+      "name": "PokemonEndpoints"
+    },
+    {
+      "name": "MyPokemonEndpoints"
+    }
+  ]
+}
