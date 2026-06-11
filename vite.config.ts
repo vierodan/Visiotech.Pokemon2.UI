@@ -7,15 +7,18 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    server: proxyTarget
-      ? {
-          proxy: {
+    server: {
+      host: 'localhost',
+      port: 5091,
+      strictPort: true,
+      proxy: proxyTarget
+        ? {
             '/api': {
               target: proxyTarget,
               changeOrigin: true,
             },
-          },
-        }
-      : undefined,
+          }
+        : undefined,
+    },
   };
 });

@@ -7,15 +7,18 @@ export default defineConfig(function (_a) {
     var proxyTarget = (_b = env.VITE_API_PROXY_TARGET) === null || _b === void 0 ? void 0 : _b.trim();
     return {
         plugins: [react()],
-        server: proxyTarget
-            ? {
-                proxy: {
+        server: {
+            host: 'localhost',
+            port: 5091,
+            strictPort: true,
+            proxy: proxyTarget
+                ? {
                     '/api': {
                         target: proxyTarget,
                         changeOrigin: true,
                     },
-                },
-            }
-            : undefined,
+                }
+                : undefined,
+        },
     };
 });
