@@ -1,4 +1,4 @@
-# Visiotech Frontend Demo
+# Pokemon2 UI
 
 Demo UI en React + Vite + TypeScript para consumir la API de Visiotech Pokémon.
 
