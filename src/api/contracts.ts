@@ -76,6 +76,60 @@ export interface MyPokemonCatalogContract {
   totalPages: ApiNumber;
 }
 
+export interface MyPokemonEquippedMovesContract {
+  moves: PokemonMoveContract[];
+  myPokemonId: string;
+}
+
+export interface PokemonLearnableMovesContract {
+  moves: PokemonMoveContract[];
+  pokemonSpeciesId: string;
+  pokemonSpeciesName: string;
+}
+
+export interface PokemonMoveSharedSpeciesContract {
+  pokemonMoveId: string;
+  pokemonMoveName: string;
+  pokemonSpecies: PokemonSpeciesContract[];
+}
+
+export interface CreatePokemonMoveRequestContract {
+  category: string | null;
+  name: string | null;
+  power: number;
+  type: string | null;
+}
+
+export type UpdatePokemonMoveRequestContract = CreatePokemonMoveRequestContract;
+
+export interface CreatePokemonSpeciesRequestContract {
+  baseStats: PokemonBaseStatsContract | null;
+  name: string | null;
+  types: string[] | null;
+}
+
+export type UpdatePokemonSpeciesRequestContract = CreatePokemonSpeciesRequestContract;
+
+export interface CreateMyPokemonRequestContract {
+  currentHealthPoints: number;
+  equippedMoveIds: string[] | null;
+  level: number;
+  pokemonSpeciesId: string;
+  totalHealthPoints: number;
+}
+
+export interface UpdateMyPokemonRequestContract {
+  currentHealthPoints: number;
+  equippedMoveIds: string[] | null;
+  level: number;
+  totalHealthPoints: number;
+}
+
+export interface UpdatePokemonLearnableMovesRequestContract {
+  addMoveIds: string[] | null;
+  removeMoveIds: string[] | null;
+}
+
 export interface CalculateMoveDamageRequestContract {
   attackerMyPokemonId: string;
   defenderMyPokemonId: string;
@@ -108,6 +162,63 @@ export interface MoveDamageCalculationContract {
   randomFactor: ApiNumber;
   rawDamage: ApiNumber;
   totalEffectiveness: number | string;
+}
+
+export interface CreateBattleRequestContract {
+  firstMyPokemonId: string;
+  secondMyPokemonId: string;
+}
+
+export interface ExecuteBattlePhaseRequestContract {
+  attackerMyPokemonId: string;
+  moveId: string;
+}
+
+export interface BattleCombatantContract {
+  currentHealthPoints: ApiNumber;
+  myPokemonId: string;
+  slotNumber: ApiNumber;
+  totalHealthPoints: ApiNumber;
+}
+
+export interface BattlePhaseEffectivenessContract {
+  defenderType: string;
+  multiplier: number | string;
+}
+
+export interface BattlePhaseContract {
+  attackerMyPokemonId: string;
+  attackerRemainingHealthPoints: ApiNumber;
+  damage: ApiNumber;
+  defenderMyPokemonId: string;
+  defenderRemainingHealthPoints: ApiNumber;
+  effectivenessBreakdown: BattlePhaseEffectivenessContract[];
+  moveId: string;
+  moveName: string;
+  randomFactor: ApiNumber;
+  sequenceNumber: ApiNumber;
+  totalEffectiveness: number | string;
+}
+
+export interface BattleHistoryContract {
+  battleId: string;
+  phases: BattlePhaseContract[];
+}
+
+export interface BattleContract {
+  combatants: BattleCombatantContract[];
+  currentTurnNumber: ApiNumber;
+  history: BattlePhaseContract[];
+  id: string;
+  loserMyPokemonId: string | null;
+  nextAttackerMyPokemonId: string | null;
+  status: string;
+  winnerMyPokemonId: string | null;
+}
+
+export interface BattlePhaseExecutionContract {
+  battle: BattleContract;
+  damageCalculation: MoveDamageCalculationContract;
 }
 
 export interface PokemonSpeciesCatalogQuery {

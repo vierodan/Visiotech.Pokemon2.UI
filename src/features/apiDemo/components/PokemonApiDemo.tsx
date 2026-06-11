@@ -1,7 +1,9 @@
 import { SectionCard } from '../../../components/shared/SectionCard';
 import { ApiConnectionPanel } from './ApiConnectionPanel';
+import { BattleWorkbench } from './BattleWorkbench';
 import { CatalogExplorer } from './CatalogExplorer';
 import { DamageCalculatorPanel } from './DamageCalculatorPanel';
+import { EndpointWorkbench } from './EndpointWorkbench';
 import { SystemInfoPanel } from './SystemInfoPanel';
 
 export function PokemonApiDemo(): JSX.Element {
@@ -32,13 +34,28 @@ export function PokemonApiDemo(): JSX.Element {
       </SectionCard>
 
       <SectionCard
+        eyebrow="Operaciones"
+        title="Workbench CRUD y relaciones"
+        description="La demo ya permite probar creación, detalle, actualización, borrado y endpoints relacionales de moves, pokemons y my-pokemons."
+      >
+        <EndpointWorkbench />
+      </SectionCard>
+
+      <SectionCard
         eyebrow="Acción"
         title="Cálculo de daño real"
         description="La demo ejecuta un caso de uso backend con datos reales ya cargados en la API."
       >
         <DamageCalculatorPanel />
       </SectionCard>
+
+      <SectionCard
+        eyebrow="Batallas"
+        title="Flujo completo de battle endpoints"
+        description="Incluye creación de batalla, consulta de estado, lectura de historial y ejecución de fases."
+      >
+        <BattleWorkbench />
+      </SectionCard>
     </>
   );
 }
-
