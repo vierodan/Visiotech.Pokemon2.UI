@@ -5,6 +5,7 @@ import { pokemonApi } from '../../../api/pokemonApi';
 import type { SystemInfoContract } from '../../../api/contracts';
 import { createRequestState, type RequestState } from '../types/apiDemo';
 import styles from './ApiDemo.module.css';
+import { TestingGuide } from './TestingGuide';
 
 export function SystemInfoPanel(): JSX.Element {
   const [state, setState] = useState<RequestState<SystemInfoContract>>(createRequestState<SystemInfoContract>());
@@ -65,6 +66,15 @@ export function SystemInfoPanel(): JSX.Element {
 
   return (
     <div className={styles.stack}>
+      <TestingGuide
+        steps={[
+          'Asegurate de que la API esta levantada en localhost:5090.',
+          'Pulsa Refrescar para lanzar GET /api/v1/system.',
+          'Verifica que aparecen service, environment, version y generatedAt con datos reales del backend.',
+        ]}
+        hint="Esta es la comprobacion mas rapida para confirmar que la UI realmente esta hablando con el backend esperado."
+      />
+
       <div className={styles.sectionHeader}>
         <div>
           <p className={styles.panelEyebrow}>GET /api/v1/system</p>
@@ -120,4 +130,3 @@ export function SystemInfoPanel(): JSX.Element {
     </div>
   );
 }
-

@@ -21,6 +21,7 @@ import type {
 import { createRequestState, type RequestState } from '../types/apiDemo';
 import { ApiResultView } from './ApiResultView';
 import styles from './ApiDemo.module.css';
+import { TestingGuide } from './TestingGuide';
 
 interface ReferenceData {
   moves: PokemonMoveContract[];
@@ -547,6 +548,15 @@ export function EndpointWorkbench(): JSX.Element {
       <details className={styles.detailsCard} open>
         <summary className={styles.detailsSummary}>Moves · POST, GET detail, PUT, DELETE y shared species</summary>
         <div className={styles.detailsContent}>
+          <TestingGuide
+            steps={[
+              'Rellena name, type, category y power y pulsa POST /moves para crear un movimiento.',
+              'Selecciona un move id del desplegable y usa GET /moves/{id} para ver su detalle.',
+              'Con ese mismo id, prueba GET /moves/{id}/pokemon-species para ver especies asociadas.',
+              'Modifica los campos inferiores y pulsa PUT /moves/{id} para actualizar, o DELETE /moves/{id} para borrar.',
+            ]}
+          />
+
           <form
             className={styles.operationGrid}
             onSubmit={(event) => {
@@ -707,6 +717,15 @@ export function EndpointWorkbench(): JSX.Element {
       <details className={styles.detailsCard}>
         <summary className={styles.detailsSummary}>Pokemons · POST, GET detail, PUT, DELETE y learnable moves</summary>
         <div className={styles.detailsContent}>
+          <TestingGuide
+            steps={[
+              'Crea una especie base rellenando name, types y stats y pulsando POST /pokemons.',
+              'Selecciona un pokemon id y prueba GET /pokemons/{id} para consultar el detalle.',
+              'Usa GET /pokemons/{id}/learnable-moves para revisar los movimientos aprendibles actuales.',
+              'Actualiza los datos con PUT /pokemons/{id} o cambia addMoveIds/removeMoveIds para probar learnable-moves.',
+            ]}
+          />
+
           <form
             className={styles.operationWideGrid}
             onSubmit={(event) => {
@@ -1017,6 +1036,15 @@ export function EndpointWorkbench(): JSX.Element {
       <details className={styles.detailsCard}>
         <summary className={styles.detailsSummary}>My Pokemons · POST, GET detail, PUT, DELETE y equipped moves</summary>
         <div className={styles.detailsContent}>
+          <TestingGuide
+            steps={[
+              'Selecciona una especie base, define nivel y vida, elige equippedMoveIds y pulsa POST /my-pokemons.',
+              'Con una instancia seleccionada, ejecuta GET /my-pokemons/{id} para ver su detalle.',
+              'Pulsa GET /my-pokemons/{id}/equipped-moves para comprobar la relacion de movimientos equipados.',
+              'Actualiza nivel, vida o equippedMoveIds con PUT /my-pokemons/{id}, o elimina la instancia con DELETE.',
+            ]}
+          />
+
           <form
             className={styles.operationWideGrid}
             onSubmit={(event) => {

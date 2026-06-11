@@ -13,6 +13,7 @@ import type {
 } from '../../../api/contracts';
 import { createRequestState, type RequestState } from '../types/apiDemo';
 import styles from './ApiDemo.module.css';
+import { TestingGuide } from './TestingGuide';
 
 const defaultMoveFilters: PokemonMoveCatalogQuery = {
   category: '',
@@ -259,6 +260,14 @@ export function CatalogExplorer(): JSX.Element {
   return (
     <div className={styles.catalogGrid}>
       <section className={styles.resourceCard}>
+        <TestingGuide
+          steps={[
+            'Escribe filtros opcionales en name, type o category.',
+            'Ajusta page y pageSize si quieres paginar resultados.',
+            'Pulsa Aplicar filtros o Recargar y revisa abajo las cards devueltas por GET /api/v1/moves.',
+          ]}
+        />
+
         <div className={styles.sectionHeader}>
           <div>
             <p className={styles.panelEyebrow}>GET /api/v1/moves</p>
@@ -366,6 +375,14 @@ export function CatalogExplorer(): JSX.Element {
       </section>
 
       <section className={styles.resourceCard}>
+        <TestingGuide
+          steps={[
+            'Filtra especies por name o type si quieres acotar el catalogo.',
+            'Pulsa Aplicar filtros para ejecutar GET /api/v1/pokemons.',
+            'Comprueba abajo los tipos, stats base e ids de las especies recibidas.',
+          ]}
+        />
+
         <div className={styles.sectionHeader}>
           <div>
             <p className={styles.panelEyebrow}>GET /api/v1/pokemons</p>
@@ -470,6 +487,14 @@ export function CatalogExplorer(): JSX.Element {
       </section>
 
       <section className={styles.resourceCard}>
+        <TestingGuide
+          steps={[
+            'Ajusta page y pageSize para consultar las instancias jugables.',
+            'Pulsa Aplicar filtros o Recargar para ejecutar GET /api/v1/my-pokemons.',
+            'Revisa abajo cada instancia, su especie, su nivel y sus movimientos equipados.',
+          ]}
+        />
+
         <div className={styles.sectionHeader}>
           <div>
             <p className={styles.panelEyebrow}>GET /api/v1/my-pokemons</p>
@@ -558,4 +583,3 @@ export function CatalogExplorer(): JSX.Element {
     </div>
   );
 }
-

@@ -5,6 +5,7 @@ import { pokemonApi } from '../../../api/pokemonApi';
 import type { ApiNumber, MoveDamageCalculationContract, MyPokemonCatalogContract } from '../../../api/contracts';
 import { createRequestState, type RequestState } from '../types/apiDemo';
 import styles from './ApiDemo.module.css';
+import { TestingGuide } from './TestingGuide';
 
 interface DamageFormState {
   attackerMyPokemonId: string;
@@ -130,6 +131,15 @@ export function DamageCalculatorPanel(): JSX.Element {
 
   return (
     <div className={styles.stack}>
+      <TestingGuide
+        steps={[
+          'Asegurate de que existan al menos dos my-pokemons con movimientos equipados en la API.',
+          'Selecciona atacante, defensor y uno de los movimientos equipados del atacante.',
+          'Pulsa el boton de calculo para ejecutar POST /api/v1/damage-calculations y revisa el dano devuelto.',
+        ]}
+        hint="Si no aparecen movimientos en el selector, primero crea o actualiza my-pokemons en la seccion de operaciones."
+      />
+
       <div className={styles.sectionHeader}>
         <div>
           <p className={styles.panelEyebrow}>POST /api/v1/damage-calculations</p>

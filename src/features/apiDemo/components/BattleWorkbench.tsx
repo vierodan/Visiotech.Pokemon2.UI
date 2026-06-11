@@ -13,6 +13,7 @@ import type {
 import { createRequestState, type RequestState } from '../types/apiDemo';
 import { ApiResultView } from './ApiResultView';
 import styles from './ApiDemo.module.css';
+import { TestingGuide } from './TestingGuide';
 
 interface CreateBattleFormState {
   firstMyPokemonId: string;
@@ -256,6 +257,16 @@ export function BattleWorkbench(): JSX.Element {
 
   return (
     <div className={styles.stack}>
+      <TestingGuide
+        steps={[
+          'Pulsa Recargar my-pokemons y comprueba que hay al menos dos instancias con movimientos equipados.',
+          'Crea una batalla con POST /battles y copia o reutiliza el battle id que devuelve la respuesta.',
+          'Usa GET /battles/{id} o GET /battles/{id}/phases para consultar estado e historial.',
+          'Selecciona attackerMyPokemonId y moveId validos y ejecuta POST /battles/{id}/phases para avanzar la batalla.',
+        ]}
+        hint="La respuesta de creacion y de ejecucion de fase te va dejando el battle id y el siguiente atacante para continuar el flujo."
+      />
+
       <div className={styles.sectionHeader}>
         <div>
           <p className={styles.panelEyebrow}>Battles</p>

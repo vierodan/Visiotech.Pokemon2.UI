@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { apiConfig, hasConfiguredApi } from '../../../api/apiConfig';
 import { setAccessTokenGetter } from '../../../api/httpClient';
 import styles from './ApiDemo.module.css';
+import { TestingGuide } from './TestingGuide';
 
 export function ApiConnectionPanel(): JSX.Element {
   const [token, setToken] = useState<string>('');
@@ -17,6 +18,15 @@ export function ApiConnectionPanel(): JSX.Element {
 
   return (
     <div className={styles.stack}>
+      <TestingGuide
+        steps={[
+          'Arranca la API en http://localhost:5090 y la UI en http://localhost:5091.',
+          'Comprueba que la Base URL activa apunta a /api o al host correcto en .env.local.',
+          'Si el backend requiere autenticacion, pega aqui el Bearer token antes de usar el resto de paneles.',
+        ]}
+        hint="Si esta seccion no queda bien configurada, el resto de las pruebas de la demo no podran llamar a la API real."
+      />
+
       <div className={styles.connectionMeta}>
         <div>
           <p className={styles.panelEyebrow}>Configuración</p>
@@ -60,4 +70,3 @@ export function ApiConnectionPanel(): JSX.Element {
     </div>
   );
 }
-

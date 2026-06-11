@@ -17,7 +17,7 @@ export function ApiResultView<T>({
   if (state.status === 'idle') {
     return (
       <div className={styles.noticeBox}>
-        <strong>Listo para probar</strong>
+        <strong>Sin ejecutar todavia</strong>
         <p>{idleMessage}</p>
       </div>
     );
@@ -57,4 +57,3 @@ export function ApiResultView<T>({
     </div>
   );
 }
-
