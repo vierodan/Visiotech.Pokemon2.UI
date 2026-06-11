@@ -26,12 +26,15 @@ export class HttpError extends Error {
 }
 
 let accessTokenGetter: AccessTokenGetter | null = null;
+let lastResponseStatus: number | null = null;
 
 export const setAccessTokenGetter = (getter: AccessTokenGetter | null): void => {
   accessTokenGetter = getter;
 };
 
-const buildUrl = (path: string, query?: QueryParams): string => {
+export const getLastResponseStatus = (): number | null => lastResponseStatus;
+
+export const resolveApiUrl = (path: string, query?: QueryParams): string => {
   if (!apiConfig.baseUrl) {
     throw new Error('VITE_API_BASE_URL is not configured.');
   }
@@ -112,12 +115,13 @@ const request = async <T>(
   const timeoutId = window.setTimeout(() => controller.abort(), apiConfig.timeoutMs);
 
   try {
-    const response = await fetch(buildUrl(path, options.query), {
+    const response = await fetch(resolveApiUrl(path, options.query), {
       method,
       body: serializeBody(options.body),
       headers: buildHeaders(options.body, options.headers, options.auth),
       signal: options.signal ?? controller.signal,
     });
+    lastResponseStatus = response.status;
 
     const payload = await parseResponse(response);
 

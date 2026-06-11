@@ -12,7 +12,7 @@ export function DemoApiPanel(): JSX.Element {
     <div className={styles.panel}>
       <div className={styles.toolbar}>
         <div>
-          <p className={styles.kicker}>Feature demo</p>
+          <p className={styles.kicker}>Demo funcional</p>
           <h3 className={styles.title}>Simulación de capa API y estados de UI</h3>
         </div>
 
@@ -41,7 +41,7 @@ export function DemoApiPanel(): JSX.Element {
         <span className={styles.statusChip}>Fuente activa: {source}</span>
         <span className={styles.statusHint}>
           {hasConfiguredApi
-            ? 'La llamada real usa GET /demo como endpoint placeholder.'
+            ? 'La llamada real usa GET /demo como endpoint provisional.'
             : 'Añade VITE_API_BASE_URL para activar la prueba HTTP real.'}
         </span>
       </div>
@@ -97,4 +97,3 @@ export function DemoApiPanel(): JSX.Element {
     </div>
   );
 }
-

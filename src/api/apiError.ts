@@ -36,3 +36,10 @@ export const getApiErrorMessage = (error: unknown): string => {
   return 'Ha ocurrido un error inesperado al contactar con la API.';
 };
 
+export const getApiErrorStatus = (error: unknown): number | null => {
+  if (error instanceof HttpError) {
+    return error.status;
+  }
+
+  return null;
+};

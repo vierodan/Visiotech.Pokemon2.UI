@@ -14,10 +14,12 @@ export function ApiResultView<T>({
   state,
   successMessage = 'Respuesta recibida correctamente.',
 }: ApiResultViewProps<T>): JSX.Element {
+  const httpStatusText = state.httpStatus ? `HTTP ${state.httpStatus}` : null;
+
   if (state.status === 'idle') {
     return (
       <div className={styles.noticeBox}>
-        <strong>Sin ejecutar todavia</strong>
+        <strong>Sin ejecutar todavía</strong>
         <p>{idleMessage}</p>
       </div>
     );
@@ -37,6 +39,7 @@ export function ApiResultView<T>({
       <div className={styles.errorBox}>
         <strong>Error de API</strong>
         <p>{state.error ?? 'Ha fallado la petición.'}</p>
+        {httpStatusText ? <p className={styles.helperText}>{httpStatusText}</p> : null}
       </div>
     );
   }
@@ -46,6 +49,7 @@ export function ApiResultView<T>({
       <div className={styles.resultCard}>
         <strong>{successMessage}</strong>
         <p className={styles.helperText}>{emptyMessage}</p>
+        {httpStatusText ? <p className={styles.helperText}>{httpStatusText}</p> : null}
       </div>
     );
   }
@@ -53,6 +57,7 @@ export function ApiResultView<T>({
   return (
     <div className={styles.resultCard}>
       <strong>{successMessage}</strong>
+      {httpStatusText ? <p className={styles.helperText}>{httpStatusText}</p> : null}
       <pre className={styles.jsonBlock}>{JSON.stringify(state.data, null, 2)}</pre>
     </div>
   );

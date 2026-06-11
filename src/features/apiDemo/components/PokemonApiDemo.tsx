@@ -36,7 +36,7 @@ export function PokemonApiDemo(): JSX.Element {
       <SectionCard
         eyebrow="Operaciones"
         title="Workbench CRUD y relaciones"
-        description="La demo ya permite probar creación, detalle, actualización, borrado y endpoints relacionales de moves, pokemons y my-pokemons."
+        description="La demo ya permite probar creación, detalle, actualización, borrado y endpoints relacionales de movimientos, especies base e instancias jugables."
       >
         <EndpointWorkbench />
       </SectionCard>
@@ -51,7 +51,7 @@ export function PokemonApiDemo(): JSX.Element {
 
       <SectionCard
         eyebrow="Batallas"
-        title="Flujo completo de battle endpoints"
+        title="Flujo completo de endpoints de batalla"
         description="Incluye creación de batalla, consulta de estado, lectura de historial y ejecución de fases."
       >
         <BattleWorkbench />

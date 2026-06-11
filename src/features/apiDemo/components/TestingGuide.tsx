@@ -9,7 +9,7 @@ interface TestingGuideProps {
 export function TestingGuide({
   hint,
   steps,
-  title = 'Como probar esta seccion',
+  title = 'Cómo probar esta sección',
 }: TestingGuideProps): JSX.Element {
   return (
     <aside className={styles.testingGuide}>

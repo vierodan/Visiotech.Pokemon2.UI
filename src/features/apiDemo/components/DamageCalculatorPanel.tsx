@@ -1,11 +1,22 @@
 import { useEffect, useState } from 'react';
-import { getApiErrorMessage } from '../../../api/apiError';
+import { getApiErrorMessage, getApiErrorStatus } from '../../../api/apiError';
 import { hasConfiguredApi } from '../../../api/apiConfig';
+import { getLastResponseStatus } from '../../../api/httpClient';
 import { pokemonApi } from '../../../api/pokemonApi';
 import type { ApiNumber, MoveDamageCalculationContract, MyPokemonCatalogContract } from '../../../api/contracts';
-import { createRequestState, type RequestState } from '../types/apiDemo';
+import {
+  createRequestError,
+  createRequestState,
+  createRequestSuccess,
+  setRequestLoading,
+  type RequestState,
+} from '../types/apiDemo';
 import styles from './ApiDemo.module.css';
+import { ApiActionButton } from './ApiActionButton';
+import { EndpointCallout } from './EndpointCallout';
+import { EndpointStepTitle } from './EndpointStepTitle';
 import { TestingGuide } from './TestingGuide';
+import { endpointDocs } from './endpointDocs';
 
 interface DamageFormState {
   attackerMyPokemonId: string;
@@ -39,23 +50,16 @@ export function DamageCalculatorPanel(): JSX.Element {
       setCatalogState({
         data: null,
         error: null,
+        httpStatus: null,
         status: 'loading',
       });
 
       try {
         const data = await pokemonApi.getMyPokemons({ page: 1, pageSize: 20 });
 
-        setCatalogState({
-          data,
-          error: null,
-          status: 'success',
-        });
+        setCatalogState(createRequestSuccess(data, getLastResponseStatus()));
       } catch (error) {
-        setCatalogState({
-          data: null,
-          error: getApiErrorMessage(error),
-          status: 'error',
-        });
+        setCatalogState(createRequestError(getApiErrorMessage(error), getApiErrorStatus(error)));
       }
     })();
   }, []);
@@ -106,40 +110,18 @@ export function DamageCalculatorPanel(): JSX.Element {
   }, [formState.moveId, selectedAttacker]);
 
   const handleCalculation = async (): Promise<void> => {
-    setCalculationState((current) => ({
-      ...current,
-      error: null,
-      status: 'loading',
-    }));
+    setCalculationState((current) => setRequestLoading(current));
 
     try {
       const data = await pokemonApi.calculateMoveDamage(formState);
-
-      setCalculationState({
-        data,
-        error: null,
-        status: 'success',
-      });
+      setCalculationState(createRequestSuccess(data, getLastResponseStatus()));
     } catch (error) {
-      setCalculationState({
-        data: null,
-        error: getApiErrorMessage(error),
-        status: 'error',
-      });
+      setCalculationState(createRequestError(getApiErrorMessage(error), getApiErrorStatus(error)));
     }
   };
 
   return (
     <div className={styles.stack}>
-      <TestingGuide
-        steps={[
-          'Asegurate de que existan al menos dos my-pokemons con movimientos equipados en la API.',
-          'Selecciona atacante, defensor y uno de los movimientos equipados del atacante.',
-          'Pulsa el boton de calculo para ejecutar POST /api/v1/damage-calculations y revisa el dano devuelto.',
-        ]}
-        hint="Si no aparecen movimientos en el selector, primero crea o actualiza my-pokemons en la seccion de operaciones."
-      />
-
       <div className={styles.sectionHeader}>
         <div>
           <p className={styles.panelEyebrow}>POST /api/v1/damage-calculations</p>
@@ -177,14 +159,31 @@ export function DamageCalculatorPanel(): JSX.Element {
       ) : null}
 
       {catalogState.status === 'success' && catalogState.data && catalogState.data.items.length > 0 ? (
-        <>
-          <form
-            className={styles.calculationForm}
-            onSubmit={(event) => {
-              event.preventDefault();
-              void handleCalculation();
-            }}
-          >
+        <form
+          className={styles.endpointStep}
+          onSubmit={(event) => {
+            event.preventDefault();
+            void handleCalculation();
+          }}
+        >
+          <EndpointStepTitle path="/api/v1/damage-calculations" title="Calcular daño" />
+          <TestingGuide
+            steps={[
+              'Asegúrate de que existan al menos dos my-pokemons con movimientos equipados en la API.',
+              'Selecciona atacante, defensor y uno de los movimientos equipados del atacante.',
+              'Pulsa el botón de cálculo para ejecutar POST /api/v1/damage-calculations y revisa el daño devuelto.',
+            ]}
+            hint="Si no aparecen movimientos en el selector, primero crea o actualiza my-pokemons en la sección de operaciones."
+          />
+          <EndpointCallout {...endpointDocs.damageCalculate} />
+          <div className={styles.endpointStepAction}>
+            <ApiActionButton
+              disabled={!formState.attackerMyPokemonId || !formState.defenderMyPokemonId || !formState.moveId}
+              requests={[{ method: 'POST', path: '/api/v1/damage-calculations' }]}
+              type="submit"
+            />
+          </div>
+          <div className={styles.endpointStepFields}>
             <label className={styles.field}>
               <span className={styles.label}>attackerMyPokemonId</span>
               <select
@@ -249,15 +248,7 @@ export function DamageCalculatorPanel(): JSX.Element {
                 )}
               </select>
             </label>
-
-            <button
-              className={styles.primaryButton}
-              type="submit"
-              disabled={!formState.attackerMyPokemonId || !formState.defenderMyPokemonId || !formState.moveId}
-            >
-              Calcular daño
-            </button>
-          </form>
+          </div>
 
           {calculationState.status === 'loading' ? (
             <div className={styles.noticeBox}>
@@ -288,43 +279,32 @@ export function DamageCalculatorPanel(): JSX.Element {
                   <strong>{toDisplayValue(calculationState.data.damage)}</strong>
                 </div>
                 <div>
-                  <span className={styles.resultLabel}>Vida restante del defensor</span>
-                  <strong>{toDisplayValue(calculationState.data.defenderRemainingHealthPoints)}</strong>
+                  <span className={styles.resultLabel}>Atacante</span>
+                  <strong>{calculationState.data.attackerMyPokemonId}</strong>
                 </div>
                 <div>
-                  <span className={styles.resultLabel}>Efectividad total</span>
-                  <strong>{toDisplayValue(calculationState.data.totalEffectiveness)}</strong>
+                  <span className={styles.resultLabel}>Defensor</span>
+                  <strong>{calculationState.data.defenderMyPokemonId}</strong>
                 </div>
               </div>
-
               <div className={styles.breakdown}>
-                <p className={styles.breakdownTitle}>Detalle técnico</p>
+                <p className={styles.breakdownTitle}>Desglose de cálculo</p>
                 <ul className={styles.breakdownList}>
+                  <li>Base damage: {toDisplayValue(calculationState.data.baseDamage)}</li>
+                  <li>Raw damage: {toDisplayValue(calculationState.data.rawDamage)}</li>
                   <li>
-                    Potencia base: {toDisplayValue(calculationState.data.movePower)} · Random factor:{' '}
-                    {toDisplayValue(calculationState.data.randomFactor)}
+                    {calculationState.data.offensiveStat}: {toDisplayValue(calculationState.data.offensiveStatValue)}
                   </li>
                   <li>
-                    Stat ofensivo: {calculationState.data.offensiveStat} ({toDisplayValue(calculationState.data.offensiveStatValue)})
+                    {calculationState.data.defensiveStat}: {toDisplayValue(calculationState.data.defensiveStatValue)}
                   </li>
-                  <li>
-                    Stat defensivo: {calculationState.data.defensiveStat} ({toDisplayValue(calculationState.data.defensiveStatValue)})
-                  </li>
-                  <li>
-                    Base damage: {toDisplayValue(calculationState.data.baseDamage)} · Raw damage:{' '}
-                    {toDisplayValue(calculationState.data.rawDamage)}
-                  </li>
-                  <li>
-                    Breakdown:{' '}
-                    {calculationState.data.effectivenessBreakdown
-                      .map((item) => `${item.defenderType} x${item.multiplier}`)
-                      .join(', ')}
-                  </li>
+                  <li>Random factor: {toDisplayValue(calculationState.data.randomFactor)}</li>
+                  <li>Total effectiveness: {toDisplayValue(calculationState.data.totalEffectiveness)}</li>
                 </ul>
               </div>
             </div>
           ) : null}
-        </>
+        </form>
       ) : null}
     </div>
   );

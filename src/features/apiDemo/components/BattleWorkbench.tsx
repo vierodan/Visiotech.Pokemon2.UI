@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getApiErrorMessage } from '../../../api/apiError';
+import { getApiErrorMessage, getApiErrorStatus } from '../../../api/apiError';
 import { hasConfiguredApi } from '../../../api/apiConfig';
+import { getLastResponseStatus } from '../../../api/httpClient';
 import { pokemonApi } from '../../../api/pokemonApi';
 import type {
   BattleContract,
@@ -8,12 +9,21 @@ import type {
   BattlePhaseExecutionContract,
   CreateBattleRequestContract,
   MyPokemonCatalogContract,
-  MyPokemonContract,
 } from '../../../api/contracts';
-import { createRequestState, type RequestState } from '../types/apiDemo';
+import {
+  createRequestError,
+  createRequestState,
+  createRequestSuccess,
+  setRequestLoading,
+  type RequestState,
+} from '../types/apiDemo';
 import { ApiResultView } from './ApiResultView';
 import styles from './ApiDemo.module.css';
+import { ApiActionButton } from './ApiActionButton';
+import { EndpointCallout } from './EndpointCallout';
+import { EndpointStepTitle } from './EndpointStepTitle';
 import { TestingGuide } from './TestingGuide';
+import { endpointDocs } from './endpointDocs';
 
 interface CreateBattleFormState {
   firstMyPokemonId: string;
@@ -36,14 +46,11 @@ const defaultExecutePhaseForm: ExecutePhaseFormState = {
 };
 
 const setLoading = <T,>(setter: React.Dispatch<React.SetStateAction<RequestState<T>>>): void => {
-  setter((current) => ({
-    ...current,
-    error: null,
-    status: 'loading',
-  }));
+  setter((current) => setRequestLoading(current));
 };
 
 export function BattleWorkbench(): JSX.Element {
+  const battleIdOptionsId = 'battle-id-options';
   const [referencesState, setReferencesState] = useState<RequestState<MyPokemonCatalogContract>>(
     createRequestState<MyPokemonCatalogContract>(),
   );
@@ -63,27 +70,16 @@ export function BattleWorkbench(): JSX.Element {
   const [phaseExecutionState, setPhaseExecutionState] = useState<RequestState<BattlePhaseExecutionContract>>(
     createRequestState<BattlePhaseExecutionContract>(),
   );
+  const normalizedBattleId = battleId.trim();
 
   const refreshMyPokemons = async (): Promise<void> => {
-    setReferencesState((current) => ({
-      ...current,
-      error: null,
-      status: 'loading',
-    }));
+    setReferencesState((current) => setRequestLoading(current));
 
     try {
       const data = await pokemonApi.getMyPokemons({ page: 1, pageSize: 100 });
-      setReferencesState({
-        data,
-        error: null,
-        status: 'success',
-      });
+      setReferencesState(createRequestSuccess(data, getLastResponseStatus()));
     } catch (error) {
-      setReferencesState({
-        data: null,
-        error: getApiErrorMessage(error),
-        status: 'error',
-      });
+      setReferencesState(createRequestError(getApiErrorMessage(error), getApiErrorStatus(error)));
     }
   };
 
@@ -96,6 +92,41 @@ export function BattleWorkbench(): JSX.Element {
   }, []);
 
   const myPokemons = useMemo(() => referencesState.data?.items ?? [], [referencesState.data?.items]);
+  const knownBattles = useMemo(() => {
+    const battleMap = new Map<string, BattleContract>();
+
+    const registerBattle = (battle: BattleContract | null | undefined): void => {
+      if (!battle) {
+        return;
+      }
+
+      battleMap.set(battle.id, battle);
+    };
+
+    registerBattle(battleCreateState.data);
+    registerBattle(battleDetailState.data);
+    registerBattle(phaseExecutionState.data?.battle);
+
+    return Array.from(battleMap.values());
+  }, [battleCreateState.data, battleDetailState.data, phaseExecutionState.data]);
+
+  const knownBattleIds = useMemo(() => {
+    const ids = new Set<string>();
+
+    knownBattles.forEach((battle) => {
+      ids.add(battle.id);
+    });
+
+    if (battleHistoryState.data?.battleId) {
+      ids.add(battleHistoryState.data.battleId);
+    }
+
+    if (battleId.trim()) {
+      ids.add(battleId.trim());
+    }
+
+    return Array.from(ids);
+  }, [battleHistoryState.data?.battleId, battleId, knownBattles]);
 
   useEffect(() => {
     if (myPokemons.length === 0) {
@@ -112,8 +143,8 @@ export function BattleWorkbench(): JSX.Element {
     }));
   }, [myPokemons]);
 
-  const selectedAttacker: MyPokemonContract | null =
-    myPokemons.find((item) => item.id === executePhaseForm.attackerMyPokemonId) ?? null;
+  const selectedAttacker =
+    myPokemons.find((item) => item.id === executePhaseForm.attackerMyPokemonId.trim()) ?? null;
 
   const attackerMoves = useMemo(() => selectedAttacker?.equippedMoves ?? [], [selectedAttacker]);
 
@@ -136,6 +167,23 @@ export function BattleWorkbench(): JSX.Element {
     }
   }, [attackerMoves, executePhaseForm.moveId]);
 
+  const loadBattleById = async (id: string): Promise<void> => {
+    const nextBattleId = id.trim();
+
+    if (!nextBattleId) {
+      return;
+    }
+
+    setLoading(setBattleDetailState);
+
+    try {
+      const data = await pokemonApi.getBattle(nextBattleId);
+      setBattleDetailState(createRequestSuccess(data, getLastResponseStatus()));
+    } catch (error) {
+      setBattleDetailState(createRequestError(getApiErrorMessage(error), getApiErrorStatus(error)));
+    }
+  };
+
   const createBattle = async (): Promise<void> => {
     setLoading(setBattleCreateState);
 
@@ -145,104 +193,48 @@ export function BattleWorkbench(): JSX.Element {
         secondMyPokemonId: createBattleForm.secondMyPokemonId,
       };
       const data = await pokemonApi.createBattle(body);
-      setBattleCreateState({
-        data,
-        error: null,
-        status: 'success',
-      });
+      const httpStatus = getLastResponseStatus();
+      setBattleCreateState(createRequestSuccess(data, httpStatus));
+      setBattleDetailState(createRequestSuccess(data, httpStatus));
       setBattleId(data.id);
-      setExecutePhaseForm((current) => ({
-        ...current,
-        attackerMyPokemonId: data.nextAttackerMyPokemonId ?? current.attackerMyPokemonId,
-      }));
     } catch (error) {
-      setBattleCreateState({
-        data: null,
-        error: getApiErrorMessage(error),
-        status: 'error',
-      });
+      setBattleCreateState(createRequestError(getApiErrorMessage(error), getApiErrorStatus(error)));
     }
   };
 
   const loadBattle = async (): Promise<void> => {
-    if (!battleId.trim()) {
-      return;
-    }
-
-    setLoading(setBattleDetailState);
-
-    try {
-      const data = await pokemonApi.getBattle(battleId.trim());
-      setBattleDetailState({
-        data,
-        error: null,
-        status: 'success',
-      });
-      setExecutePhaseForm((current) => ({
-        ...current,
-        attackerMyPokemonId: data.nextAttackerMyPokemonId ?? current.attackerMyPokemonId,
-      }));
-    } catch (error) {
-      setBattleDetailState({
-        data: null,
-        error: getApiErrorMessage(error),
-        status: 'error',
-      });
-    }
+    await loadBattleById(normalizedBattleId);
   };
 
   const loadBattleHistory = async (): Promise<void> => {
-    if (!battleId.trim()) {
+    if (!normalizedBattleId) {
       return;
     }
 
     setLoading(setBattleHistoryState);
 
     try {
-      const data = await pokemonApi.getBattleHistory(battleId.trim());
-      setBattleHistoryState({
-        data,
-        error: null,
-        status: 'success',
-      });
+      const data = await pokemonApi.getBattleHistory(normalizedBattleId);
+      setBattleHistoryState(createRequestSuccess(data, getLastResponseStatus()));
     } catch (error) {
-      setBattleHistoryState({
-        data: null,
-        error: getApiErrorMessage(error),
-        status: 'error',
-      });
+      setBattleHistoryState(createRequestError(getApiErrorMessage(error), getApiErrorStatus(error)));
     }
   };
 
   const executeBattlePhase = async (): Promise<void> => {
-    if (!battleId.trim()) {
+    if (!normalizedBattleId) {
       return;
     }
 
     setLoading(setPhaseExecutionState);
 
     try {
-      const data = await pokemonApi.executeBattlePhase(battleId.trim(), executePhaseForm);
-      setPhaseExecutionState({
-        data,
-        error: null,
-        status: 'success',
-      });
-      setBattleDetailState({
-        data: data.battle,
-        error: null,
-        status: 'success',
-      });
-      setExecutePhaseForm((current) => ({
-        ...current,
-        attackerMyPokemonId: data.battle.nextAttackerMyPokemonId ?? current.attackerMyPokemonId,
-      }));
+      const data = await pokemonApi.executeBattlePhase(normalizedBattleId, executePhaseForm);
+      const httpStatus = getLastResponseStatus();
+      setPhaseExecutionState(createRequestSuccess(data, httpStatus));
+      setBattleDetailState(createRequestSuccess(data.battle, httpStatus));
     } catch (error) {
-      setPhaseExecutionState({
-        data: null,
-        error: getApiErrorMessage(error),
-        status: 'error',
-      });
+      setPhaseExecutionState(createRequestError(getApiErrorMessage(error), getApiErrorStatus(error)));
     }
   };
 
@@ -257,180 +249,236 @@ export function BattleWorkbench(): JSX.Element {
 
   return (
     <div className={styles.stack}>
-      <TestingGuide
-        steps={[
-          'Pulsa Recargar my-pokemons y comprueba que hay al menos dos instancias con movimientos equipados.',
-          'Crea una batalla con POST /battles y copia o reutiliza el battle id que devuelve la respuesta.',
-          'Usa GET /battles/{id} o GET /battles/{id}/phases para consultar estado e historial.',
-          'Selecciona attackerMyPokemonId y moveId validos y ejecuta POST /battles/{id}/phases para avanzar la batalla.',
-        ]}
-        hint="La respuesta de creacion y de ejecucion de fase te va dejando el battle id y el siguiente atacante para continuar el flujo."
-      />
-
       <div className={styles.sectionHeader}>
         <div>
-          <p className={styles.panelEyebrow}>Battles</p>
+          <p className={styles.panelEyebrow}>Batallas</p>
           <h3 className={styles.panelTitle}>Creación, estado, historial y fases</h3>
         </div>
-        <button className={styles.secondaryButton} type="button" onClick={() => void refreshMyPokemons()}>
-          Recargar my-pokemons
-        </button>
       </div>
 
-      <ApiResultView
-        idleMessage="Este panel necesita my-pokemons válidos con movimientos equipados para probar batallas."
-        state={referencesState}
-        successMessage="Catálogo de my-pokemons cargado."
-      />
+      <div className={styles.endpointFlow}>
+        <datalist id={battleIdOptionsId}>
+          {knownBattleIds.map((knownBattleId) => (
+            <option key={knownBattleId} value={knownBattleId} />
+          ))}
+        </datalist>
 
-      <form
-        className={styles.operationGrid}
-        onSubmit={(event) => {
-          event.preventDefault();
-          void createBattle();
-        }}
-      >
-        <label className={styles.field}>
-          <span className={styles.label}>firstMyPokemonId</span>
-          <select
-            className={styles.select}
-            value={createBattleForm.firstMyPokemonId}
-            onChange={(event) =>
-              setCreateBattleForm((current) => ({
-                ...current,
-                firstMyPokemonId: event.target.value,
-              }))
-            }
-          >
-            {myPokemons.map((pokemon) => (
-              <option key={pokemon.id} value={pokemon.id}>
-                {pokemon.species.name} · {pokemon.id}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.field}>
-          <span className={styles.label}>secondMyPokemonId</span>
-          <select
-            className={styles.select}
-            value={createBattleForm.secondMyPokemonId}
-            onChange={(event) =>
-              setCreateBattleForm((current) => ({
-                ...current,
-                secondMyPokemonId: event.target.value,
-              }))
-            }
-          >
-            {myPokemons.map((pokemon) => (
-              <option key={pokemon.id} value={pokemon.id}>
-                {pokemon.species.name} · {pokemon.id}
-              </option>
-            ))}
-          </select>
-        </label>
-        <button className={styles.primaryButton} type="submit">
-          POST /battles
-        </button>
-      </form>
-
-      <div className={styles.helperRow}>
-        <label className={styles.field}>
-          <span className={styles.label}>battle id</span>
-          <input
-            className={styles.input}
-            type="text"
-            value={battleId}
-            onChange={(event) => setBattleId(event.target.value)}
-            placeholder="uuid de la batalla"
+        <section className={styles.endpointStep}>
+          <EndpointStepTitle path="/api/v1/my-pokemons" title="Cargar instancias jugables disponibles" />
+          <TestingGuide
+            steps={[
+              'Pulsa Recargar my-pokemons y comprueba que hay al menos dos instancias con movimientos equipados.',
+              'Crea una batalla con POST /battles y copia o reutiliza el id de batalla que devuelve la respuesta.',
+              'Usa GET /battles/{id} o GET /battles/{id}/phases para consultar estado e historial.',
+              'Selecciona attackerMyPokemonId y moveId válidos y ejecuta POST /battles/{id}/phases para avanzar la batalla.',
+            ]}
+            hint="La respuesta de creación y de ejecución de fase te va dejando el id de batalla y el siguiente atacante para continuar el flujo."
           />
-        </label>
-        <button className={styles.secondaryButton} type="button" onClick={() => void loadBattle()}>
-          GET /battles/{'{id}'}
-        </button>
-        <button className={styles.secondaryButton} type="button" onClick={() => void loadBattleHistory()}>
-          GET /battles/{'{id}'}/phases
-        </button>
-      </div>
+          <p className={styles.endpointStepMeta}>Primero carga las instancias jugables para poder crear y ejecutar batallas.</p>
+          <EndpointCallout {...endpointDocs.battleLoadMyPokemons} />
+          <div className={styles.endpointStepAction}>
+            <ApiActionButton
+              onClick={() => void refreshMyPokemons()}
+              requests={[{ method: 'GET', path: '/api/v1/my-pokemons' }]}
+            />
+          </div>
+          <ApiResultView
+            idleMessage="Este panel necesita my-pokemons válidos con movimientos equipados para probar batallas."
+            state={referencesState}
+            successMessage="Catálogo de my-pokemons cargado."
+          />
+        </section>
 
-      <form
-        className={styles.operationGrid}
-        onSubmit={(event) => {
-          event.preventDefault();
-          void executeBattlePhase();
-        }}
-      >
-        <label className={styles.field}>
-          <span className={styles.label}>attackerMyPokemonId</span>
-          <select
-            className={styles.select}
-            value={executePhaseForm.attackerMyPokemonId}
-            onChange={(event) =>
-              setExecutePhaseForm((current) => ({
-                ...current,
-                attackerMyPokemonId: event.target.value,
-              }))
-            }
-          >
-            {myPokemons.map((pokemon) => (
-              <option key={pokemon.id} value={pokemon.id}>
-                {pokemon.species.name} · {pokemon.id}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className={styles.field}>
-          <span className={styles.label}>moveId</span>
-          <select
-            className={styles.select}
-            value={executePhaseForm.moveId}
-            onChange={(event) =>
-              setExecutePhaseForm((current) => ({
-                ...current,
-                moveId: event.target.value,
-              }))
-            }
-            disabled={attackerMoves.length === 0}
-          >
-            {attackerMoves.length > 0 ? (
-              attackerMoves.map((move) => (
-                <option key={move.id} value={move.id}>
-                  {move.name} · {move.id}
-                </option>
-              ))
-            ) : (
-              <option value="">El atacante no tiene movimientos equipados</option>
-            )}
-          </select>
-        </label>
-        <button className={styles.primaryButton} type="submit">
-          POST /battles/{'{id}'}/phases
-        </button>
-      </form>
+        <form
+          className={styles.endpointStep}
+          onSubmit={(event) => {
+            event.preventDefault();
+            void createBattle();
+          }}
+        >
+          <EndpointStepTitle path="/api/v1/battles" title="Crear batalla" />
+          <EndpointCallout {...endpointDocs.battleCreate} />
+          <div className={styles.endpointStepAction}>
+            <ApiActionButton requests={[{ method: 'POST', path: '/api/v1/battles' }]} type="submit" />
+          </div>
+          <div className={styles.endpointStepFields}>
+            <label className={styles.field}>
+              <span className={styles.label}>firstMyPokemonId</span>
+              <select
+                className={styles.select}
+                value={createBattleForm.firstMyPokemonId}
+                onChange={(event) =>
+                  setCreateBattleForm((current) => ({
+                    ...current,
+                    firstMyPokemonId: event.target.value,
+                  }))
+                }
+              >
+                {myPokemons.map((pokemon) => (
+                  <option key={pokemon.id} value={pokemon.id}>
+                    {pokemon.species.name} · {pokemon.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className={styles.field}>
+              <span className={styles.label}>secondMyPokemonId</span>
+              <select
+                className={styles.select}
+                value={createBattleForm.secondMyPokemonId}
+                onChange={(event) =>
+                  setCreateBattleForm((current) => ({
+                    ...current,
+                    secondMyPokemonId: event.target.value,
+                  }))
+                }
+              >
+                {myPokemons.map((pokemon) => (
+                  <option key={pokemon.id} value={pokemon.id}>
+                    {pokemon.species.name} · {pokemon.id}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <ApiResultView
+            idleMessage="Crea una batalla con exactamente dos my-pokemons."
+            state={battleCreateState}
+            successMessage="Batalla creada."
+          />
+        </form>
 
-      <div className={styles.dualColumn}>
-        <ApiResultView
-          idleMessage="Crea una batalla con exactamente dos my-pokemons."
-          state={battleCreateState}
-          successMessage="Batalla creada."
-        />
-        <ApiResultView
-          idleMessage="Consulta el estado actual de una batalla concreta."
-          state={battleDetailState}
-          successMessage="Estado de batalla."
-        />
-      </div>
+        <section className={styles.endpointStep}>
+          <EndpointStepTitle path="/api/v1/battles/{id}" title="Consultar estado de batalla" />
+          <EndpointCallout {...endpointDocs.battleDetail} />
+          <div className={styles.endpointStepAction}>
+            <ApiActionButton
+              onClick={() => void loadBattle()}
+              requests={[{ method: 'GET', path: `/api/v1/battles/${battleId}` }]}
+            />
+          </div>
+          <div className={styles.endpointStepFields}>
+            <label className={styles.field}>
+              <span className={styles.label}>id de batalla</span>
+              <input
+                className={styles.input}
+                list={battleIdOptionsId}
+                type="text"
+                value={battleId}
+                onChange={(event) => setBattleId(event.target.value)}
+                placeholder="Pega o selecciona un id de batalla"
+              />
+            </label>
+          </div>
+          <ApiResultView
+            idleMessage="Consulta el estado actual de una batalla concreta."
+            state={battleDetailState}
+            successMessage="Estado de batalla."
+          />
+        </section>
 
-      <div className={styles.dualColumn}>
-        <ApiResultView
-          idleMessage="Consulta el historial ordenado de fases."
-          state={battleHistoryState}
-          successMessage="Historial de batalla."
-        />
-        <ApiResultView
-          idleMessage="Ejecuta la siguiente fase usando attackerMyPokemonId y moveId."
-          state={phaseExecutionState}
-          successMessage="Fase ejecutada."
-        />
+        <section className={styles.endpointStep}>
+          <EndpointStepTitle path="/api/v1/battles/{id}/phases" title="Consultar historial de fases" />
+          <EndpointCallout {...endpointDocs.battleHistory} />
+          <div className={styles.endpointStepAction}>
+            <ApiActionButton
+              onClick={() => void loadBattleHistory()}
+              requests={[{ method: 'GET', path: `/api/v1/battles/${battleId}/phases` }]}
+            />
+          </div>
+          <div className={styles.endpointStepFields}>
+            <label className={styles.field}>
+              <span className={styles.label}>id de batalla</span>
+              <input
+                className={styles.input}
+                list={battleIdOptionsId}
+                type="text"
+                value={battleId}
+                onChange={(event) => setBattleId(event.target.value)}
+                placeholder="Pega o selecciona un id de batalla"
+              />
+            </label>
+          </div>
+          <ApiResultView
+            idleMessage="Consulta el historial ordenado de fases."
+            state={battleHistoryState}
+            successMessage="Historial de batalla."
+          />
+        </section>
+
+        <form
+          className={styles.endpointStep}
+          onSubmit={(event) => {
+            event.preventDefault();
+            void executeBattlePhase();
+          }}
+        >
+          <EndpointStepTitle path="/api/v1/battles/{id}/phases" title="Ejecutar fase de batalla" />
+          <EndpointCallout {...endpointDocs.battleExecute} />
+          <div className={styles.endpointStepAction}>
+            <ApiActionButton
+              requests={[{ method: 'POST', path: `/api/v1/battles/${battleId}/phases` }]}
+              type="submit"
+            />
+          </div>
+          <div className={styles.endpointStepFields}>
+            <label className={styles.field}>
+              <span className={styles.label}>id de batalla</span>
+              <input
+                className={styles.input}
+                list={battleIdOptionsId}
+                type="text"
+                value={battleId}
+                onChange={(event) => setBattleId(event.target.value)}
+                placeholder="Pega o selecciona un id de batalla"
+              />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.label}>attackerMyPokemonId</span>
+              <input
+                className={styles.input}
+                type="text"
+                value={executePhaseForm.attackerMyPokemonId}
+                onChange={(event) =>
+                  setExecutePhaseForm((current) => ({
+                    ...current,
+                    attackerMyPokemonId: event.target.value,
+                  }))
+                }
+                placeholder="Pega el attackerMyPokemonId"
+              />
+            </label>
+            <label className={styles.field}>
+              <span className={styles.label}>moveId</span>
+              <select
+                className={styles.select}
+                value={executePhaseForm.moveId}
+                onChange={(event) =>
+                  setExecutePhaseForm((current) => ({
+                    ...current,
+                    moveId: event.target.value,
+                  }))
+                }
+                disabled={attackerMoves.length === 0}
+              >
+                {attackerMoves.length > 0 ? (
+                  attackerMoves.map((move) => (
+                    <option key={move.id} value={move.id}>
+                      {move.name} · {move.id}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">El atacante no tiene movimientos equipados</option>
+                )}
+              </select>
+            </label>
+          </div>
+          <ApiResultView
+            idleMessage="Ejecuta la siguiente fase usando attackerMyPokemonId y moveId."
+            state={phaseExecutionState}
+            successMessage="Fase ejecutada."
+          />
+        </form>
       </div>
     </div>
   );

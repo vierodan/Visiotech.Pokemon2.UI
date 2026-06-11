@@ -22,9 +22,9 @@ export function ApiConnectionPanel(): JSX.Element {
         steps={[
           'Arranca la API en http://localhost:5090 y la UI en http://localhost:5091.',
           'Comprueba que la Base URL activa apunta a /api o al host correcto en .env.local.',
-          'Si el backend requiere autenticacion, pega aqui el Bearer token antes de usar el resto de paneles.',
+          'Si el backend requiere autenticación, pega aquí el Bearer token antes de usar el resto de paneles.',
         ]}
-        hint="Si esta seccion no queda bien configurada, el resto de las pruebas de la demo no podran llamar a la API real."
+        hint="Si esta sección no queda bien configurada, el resto de las pruebas de la demo no podrán llamar a la API real."
       />
 
       <div className={styles.connectionMeta}>
