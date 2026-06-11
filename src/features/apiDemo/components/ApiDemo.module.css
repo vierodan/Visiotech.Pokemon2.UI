@@ -1,0 +1,286 @@
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.connectionMeta,
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panelEyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.panelTitle {
+  margin: 0;
+  color: var(--color-ink-strong);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+
+.positiveBadge,
+.warningBadge,
+.infoPill,
+.itemBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.positiveBadge {
+  background: rgba(61, 122, 94, 0.14);
+  color: var(--color-success);
+}
+
+.warningBadge {
+  background: rgba(242, 140, 82, 0.16);
+  color: var(--color-accent-strong);
+}
+
+.infoPill {
+  background: rgba(31, 74, 122, 0.12);
+  color: var(--color-primary);
+}
+
+.infoGrid,
+.metricGrid,
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.infoItem,
+.metricCard {
+  display: grid;
+  gap: 0.35rem;
+  background: rgba(14, 27, 43, 0.04);
+  border: 1px solid rgba(14, 27, 43, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.infoLabel,
+.metricLabel,
+.resultLabel,
+.label {
+  color: var(--color-ink-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.codeBlock,
+.inlineCode {
+  font-family: var(--font-mono);
+  word-break: break-word;
+}
+
+.codeBlock {
+  color: var(--color-primary);
+}
+
+.helperText,
+.catalogMeta,
+.itemText {
+  margin: 0;
+  color: var(--color-ink-soft);
+  line-height: 1.6;
+}
+
+.field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.filterForm,
+.calculationForm {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.filterForm {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
+}
+
+.calculationForm {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+}
+
+.input,
+.select {
+  width: 100%;
+  min-height: 2.9rem;
+  border: 1px solid rgba(14, 27, 43, 0.14);
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.8rem 0.95rem;
+  color: var(--color-ink-strong);
+}
+
+.primaryButton,
+.secondaryButton {
+  min-height: 2.9rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.8rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+.primaryButton {
+  background: var(--color-accent);
+  color: var(--color-surface);
+  box-shadow: 0 12px 24px rgba(242, 140, 82, 0.22);
+}
+
+.secondaryButton {
+  background: rgba(14, 27, 43, 0.05);
+  border-color: rgba(14, 27, 43, 0.08);
+  color: var(--color-ink-strong);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover {
+  transform: translateY(-1px);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.noticeBox,
+.errorBox,
+.resultCard {
+  border-radius: 1.2rem;
+  padding: 1rem 1.1rem;
+}
+
+.noticeBox {
+  background: rgba(14, 27, 43, 0.04);
+  border: 1px solid rgba(14, 27, 43, 0.08);
+}
+
+.errorBox {
+  background: rgba(201, 72, 65, 0.08);
+  border: 1px solid rgba(201, 72, 65, 0.18);
+}
+
+.resultCard {
+  background: rgba(31, 74, 122, 0.05);
+  border: 1px solid rgba(31, 74, 122, 0.12);
+}
+
+.noticeBox strong,
+.errorBox strong,
+.resultCard strong {
+  color: var(--color-ink-strong);
+}
+
+.noticeBox p,
+.errorBox p {
+  margin: 0.35rem 0 0;
+  color: var(--color-ink-soft);
+  line-height: 1.6;
+}
+
+.catalogGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.resourceCard {
+  display: grid;
+  gap: 1rem;
+  border: 1px solid rgba(14, 27, 43, 0.08);
+  border-radius: 1.3rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.itemCard {
+  display: grid;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(14, 27, 43, 0.08);
+  border-radius: 1rem;
+  padding: 0.95rem;
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.itemBadge {
+  background: rgba(31, 74, 122, 0.1);
+  color: var(--color-primary);
+}
+
+.breakdown {
+  margin-top: 1rem;
+}
+
+.breakdownTitle {
+  margin: 0 0 0.55rem;
+  color: var(--color-ink-strong);
+  font-weight: 800;
+}
+
+.breakdownList {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--color-ink-soft);
+  display: grid;
+  gap: 0.55rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 1040px) {
+  .filterForm,
+  .calculationForm,
+  .infoGrid,
+  .metricGrid,
+  .resultGrid,
+  .itemGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .connectionMeta,
+  .sectionHeader,
+  .itemHeader {
+    flex-direction: column;
+  }
+}
+

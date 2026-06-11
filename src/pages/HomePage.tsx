@@ -1,17 +1,17 @@
 import { SectionCard } from '../components/shared/SectionCard';
-import { DemoApiPanel } from '../features/demo/components/DemoApiPanel';
+import { PokemonApiDemo } from '../features/apiDemo/components/PokemonApiDemo';
 import styles from './HomePage.module.css';
 
-const architectureItems = [
-  'Capa `api/` desacoplada de la UI para integrar fetch, headers y auth.',
-  'Features aisladas por vertical para que cada dominio crezca sin contaminar el resto.',
-  'Layout y componentes compartidos separados de páginas y lógica remota.',
+const contractHighlights = [
+  'El contrato publica catálogos de `moves`, `pokemons` y `my-pokemons` con paginación explícita.',
+  'Existe un endpoint técnico `GET /api/v1/system` ideal para validar conectividad sin depender de datos de negocio.',
+  'El caso de uso más demostrable para UI es `POST /api/v1/damage-calculations`, porque consume IDs reales y devuelve un resultado útil.',
 ];
 
 const roadmapItems = [
-  'Conectar servicios reales por feature sobre `httpClient`.',
-  'Añadir React Router cuando aparezcan más vistas.',
-  'Incorporar tests y observabilidad antes de crecer en complejidad.',
+  'Separar cada vertical del backend en su propia feature cuando empiece a crecer el producto.',
+  'Añadir navegación cuando aparezcan varias pantallas operativas reales.',
+  'Introducir tests de integración sobre servicios y componentes con datos mockeados del contrato.',
 ];
 
 export function HomePage(): JSX.Element {
@@ -19,47 +19,47 @@ export function HomePage(): JSX.Element {
     <div className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}>SPA starter</p>
-          <h2 className={styles.heroTitle}>Una base limpia para crecer sin reescribir la UI a mitad de camino.</h2>
+          <p className={styles.eyebrow}>API demo</p>
+          <h2 className={styles.heroTitle}>Una UI ligera para probar el backend real sin inventar contratos.</h2>
           <p className={styles.heroLead}>
-            Este skeleton combina una landing técnica, una capa HTTP reutilizable y una primera feature demo para
-            integrar backend externo cuando llegue el momento.
+            La página principal conecta con el OpenAPI del workspace, explora los recursos más importantes y ejecuta
+            un cálculo de daño real usando `my-pokemons` y movimientos equipados del backend.
           </p>
         </div>
 
         <div className={styles.heroStats}>
           <div>
-            <span className={styles.statValue}>React + Vite</span>
-            <span className={styles.statLabel}>arranque rápido y toolchain ligero</span>
+            <span className={styles.statValue}>OpenAPI-first</span>
+            <span className={styles.statLabel}>la UI sigue el contrato disponible en `backend/visiotech-pokemon-api-v1.json`</span>
           </div>
           <div>
-            <span className={styles.statValue}>TypeScript</span>
-            <span className={styles.statLabel}>tipado explícito en servicios, hooks y componentes</span>
+            <span className={styles.statValue}>TypeScript estricto</span>
+            <span className={styles.statLabel}>tipos explícitos en DTOs, estados remotos y componentes</span>
           </div>
           <div>
-            <span className={styles.statValue}>API-ready</span>
-            <span className={styles.statLabel}>base URL por entorno y soporte futuro para Bearer token</span>
+            <span className={styles.statValue}>HTTP real</span>
+            <span className={styles.statLabel}>base URL por `.env.local` y cliente listo para Bearer token opcional</span>
           </div>
         </div>
       </section>
 
       <section className={styles.grid}>
         <SectionCard
-          eyebrow="Arquitectura"
-          title="Preparada para evolucionar por features"
-          description="La organización prioriza separación de responsabilidades sin meter abstracciones prematuras."
+          eyebrow="Contrato"
+          title="Lo que realmente expone la API"
+          description="La demo se apoya solo en rutas y campos documentados, sin añadir DTOs ficticios."
         >
           <ul className={styles.list}>
-            {architectureItems.map((item) => (
+            {contractHighlights.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </SectionCard>
 
         <SectionCard
-          eyebrow="Próximo encaje"
-          title="Ruta natural de crecimiento"
-          description="Lo siguiente ya tiene sitio claro dentro del código sin necesidad de reordenar toda la app."
+          eyebrow="Siguiente paso"
+          title="Cómo puede crecer esta UI"
+          description="La estructura ya separa layout, capa HTTP y demo funcional para extenderse sin reescribir."
         >
           <ul className={styles.list}>
             {roadmapItems.map((item) => (
@@ -69,14 +69,7 @@ export function HomePage(): JSX.Element {
         </SectionCard>
       </section>
 
-      <SectionCard
-        eyebrow="Integración demo"
-        title="Estado de datos, errores y vacío resueltos"
-        description="La página no conoce detalles de red: delega en la feature demo y mantiene una superficie visual simple."
-      >
-        <DemoApiPanel />
-      </SectionCard>
+      <PokemonApiDemo />
     </div>
   );
 }
-

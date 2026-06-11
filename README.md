@@ -1,91 +1,43 @@
 # Visiotech Frontend Demo
 
-Skeleton inicial de una SPA con React + Vite + TypeScript preparada para crecer como demo técnica profesional y futura integración con una API externa.
+Demo UI en React + Vite + TypeScript para consumir la API documentada en `backend/visiotech-pokemon-api-v1.json`.
 
-## Stack
+## Configuración
 
-- React
-- Vite
-- TypeScript
-- CSS Modules + estilos globales
-- ESLint con configuración básica para TypeScript y React hooks
+La app usa `VITE_API_BASE_URL` desde `.env.local`.
 
-## Scripts
+```bash
+VITE_API_BASE_URL=http://localhost:5090
+```
+
+El contrato OpenAPI incluido en el workspace publica `http://localhost:5090/` como servidor de referencia, por eso ese valor se deja por defecto en la demo.
+
+## Ejecución
 
 ```bash
 npm install
 npm run dev
-npm run build
-npm run lint
 ```
 
-## Variables de entorno
-
-Duplica `.env.example` como `.env` y ajusta la URL del backend:
+Para validar compilación y lint:
 
 ```bash
-VITE_API_BASE_URL=http://localhost:3001/api
+npm run lint
+npm run build
 ```
 
-Si `VITE_API_BASE_URL` no está definida, la demo usa datos mock para que la aplicación siga siendo funcional mientras el backend aún no existe.
+## Qué demuestra la UI
 
-## Estructura
+- `GET /api/v1/system` para comprobar conectividad y metadatos del host.
+- `GET /api/v1/moves`, `GET /api/v1/pokemons` y `GET /api/v1/my-pokemons` con los filtros soportados por contrato.
+- `POST /api/v1/damage-calculations` usando IDs reales de `my-pokemons` y `equippedMoves`.
 
-```text
-src/
-  api/
-    apiConfig.ts
-    httpClient.ts
-  assets/
-    brandMark.svg
-  components/
-    layout/
-      AppShell.tsx
-      AppShell.module.css
-      Header.tsx
-      Header.module.css
-      MainContent.tsx
-      MainContent.module.css
-    shared/
-      SectionCard.tsx
-      SectionCard.module.css
-  features/
-    demo/
-      components/
-        DemoApiPanel.tsx
-        DemoApiPanel.module.css
-      hooks/
-        useDemoPreview.ts
-      services/
-        demoService.ts
-      types/
-        demo.ts
-  pages/
-    HomePage.tsx
-    HomePage.module.css
-  styles/
-    globals.css
-  App.tsx
-  main.tsx
-  vite-env.d.ts
-```
+## Estructura relevante
 
-## Arquitectura
+- `src/api/`: configuración, cliente HTTP, parsing de errores y servicios tipados.
+- `src/features/apiDemo/`: componentes de la demo conectada al backend.
+- `src/pages/HomePage.tsx`: composición principal de la experiencia.
 
-- `api/`: configuración y cliente HTTP reutilizable, con punto preparado para inyectar token Bearer más adelante.
-- `features/`: verticales funcionales listas para crecer sin mezclar lógica de dominio con layout.
-- `components/layout/`: estructura visual global de la aplicación.
-- `components/shared/`: primitivas reutilizables entre páginas y features.
-- `pages/`: entry points de pantallas de la SPA.
+## Nota sobre autenticación
 
-## Integración futura con backend
-
-La capa HTTP ya expone `get`, `post`, `put` y `delete` con tipado genérico y soporte para query params, JSON y cabecera `Authorization` cuando se configure un token.
-
-Pasos siguientes recomendados:
-
-1. Añadir endpoints reales en `features/*/services`.
-2. Definir modelos de respuesta por feature en `types/`.
-3. Incorporar tests unitarios y de integración cuando empiece la lógica de negocio.
-4. Añadir router si la SPA crece a varias páginas reales.
-
+El contrato actual no declara `securitySchemes`, pero el cliente HTTP ya permite adjuntar un Bearer token temporal desde la UI por si el backend evoluciona en esa dirección.
